@@ -1,0 +1,24 @@
+Language: Python
+IDE: Visual Studio Code
+
+/** Import Services in IDE & flow mentioned steps to run the solution **/
+
+Step 1 : run command to install the dependacy 
+
+pip3 install -r requirements.txt
+
+Step 2 : Run python3 OrdeService.py to start gRPC in a terminal
+
+Step 3 : Start RabbitMQ service 
+
+Step 4 : Run python3 RabbitMQReceiver.py in seprate terminal
+
+Step5 : Run Kafka server and ZoopKeeper server.
+
+Step 6: Run python3 KafkaReceiver file to receive order creation 
+
+/** Note: Solution build in Mac OS **/
+
+/**Assumption**/ 
+Created one Order Service using gRPC and consumed using Product service. While order place from product service than product service call Order service using gRPC & return order id. Same time Order service trigger notification msg of order id to kata broker service and rabbit mq receiver.
+

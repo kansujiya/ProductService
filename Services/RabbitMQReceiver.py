@@ -7,7 +7,6 @@ channel.queue_declare(queue='OrderCreation')
 def callback(ch, method, properties, body):  
   print("Received: %r" % (body,))
 
-# channel.basic_consume(callback, queue='hello', no_ack=True)
 channel.basic_consume('OrderCreation', callback, auto_ack=True)
 
 channel.start_consuming()

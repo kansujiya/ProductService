@@ -5,6 +5,11 @@ import grpc
 import product_pb2
 import product_pb2_grpc
 from datetime import date
+import pika
+from kafka import KafkaProducer
+from flask import json
+
+producer = KafkaProducer(bootstrap_servers = 'localhost:9092')
 
 class PlaceOrderServiceServicer(product_pb2_grpc.PlaceOrderServiceServicer): 
 	def PlaceOrder(self, request, context):
@@ -19,7 +24,21 @@ class PlaceOrderServiceServicer(product_pb2_grpc.PlaceOrderServiceServicer):
 			msg = "order placed succesfully"
 		)
 		print(order)
+		publishRabbimtMq(order.order_id)
+		publishKafkaMsg(order.order_id)
 		return order
+
+def publishRabbimtMq(order_id):
+	connection = pika.BlockingConnection(pika.ConnectionParameters('127.0.0.1'))
+	channel = connection.channel()
+	channel.queue_declare(queue='OrderCreation')		
+	body = "Order placed succesfully: Order Id is :" + str(order_id)
+	channel.basic_publish(exchange='', routing_key='OrderCreation', body=body)
+	connection.close()	
+
+def publishKafkaMsg(order_id):
+	body = "Order placed succesfully: Order Id is :" + str(order_id)
+	producer.send('test', json.dumps(body).encode('utf-8'))
 
 if __name__ == '__main__':
 	# Run a gRPC server with one thread.

@@ -11,9 +11,6 @@ import codegen
 import grpc 
 import product_pb2
 import product_pb2_grpc
-# from RabbitMQSender import RabbitMQSender
-import pika
-from kafka import KafkaProducer
 
 SERVER_ADDRESS = '0.0.0.0'
 PORT = 6556
@@ -75,12 +72,8 @@ products = [
 	}
 ]
 
-print(__name__)
-
 app = Flask(__name__)
-
 client = ProductServiceClient()
-producer = KafkaProducer(bootstrap_servers = 'localhost:9092')
 
 #GET
 @app.route('/') 
@@ -98,53 +91,9 @@ def get_product_id(id):
 
 @app.route('/placeOrder/<int:id>')
 def place_order(id):
-    res = client.get_placeOrder(id)
-    sendKafka()
-    # print(res)    
-    # rbSender = RabbitMQSender("OrderCreation")
-    connection = pika.BlockingConnection(pika.ConnectionParameters('127.0.0.1'))
-    channel = connection.channel()
-    channel.queue_declare(queue='OrderCreation')
-    # rbSender.publish_order_creation(res.order_id, res.msg, res.product_id, res.order_date, 'OrderPlaced')
-    body = res.msg + ' on ' + res.order_date + ' for ' + str(res.product_id) + ' Order Id is ' + str(res.order_id)
-    channel.basic_publish(exchange='', routing_key='OrderCreation', body=body)
-    connection.close()
-
-    # Kafka    
-    producer.send('test', json.dumps(body).encode('utf-8'))
+    res = client.get_placeOrder(id)    
+    print(res)
     return jsonify({'product_id': res.product_id, 'order_id': res.order_id, 'order_date': res.order_date, 'Message': res.msg})    
-
-
-def sendKafka():
-    producer = KafkaProducer(bootstrap_servers = 'localhost:9092')
-    mm = "hihihsuresh"
-    producer.send('test', mm.encode('utf-8'))
-# def __init__(self, queueName):
-#     connection = pika.BlockingConnection(pika.ConnectionParameters('127.0.0.1'))
-#     channel = connection.channel()
-#     channel.queue_declare(queue=queueName)
-
-# def publish_order_creation(self, order_id, msg, product_id, date, key):
-#     body = msg + 'on' + date + 'for' + str(product_id) + 'Order Id is' + str(order_id)
-#     channel.basic_publish(exchange='', routing_key=key, body=body)
-#     connection.close()
-
-# #POST
-# @app.route('/place_order', methods=['POST'])
-# def add_book():	
-# 	requestData = request.get_json()	
-# 	if (validBookObject(requestData)):
-# 		# books.insert(0, requestData)		
-# 		Book.add_book(requestData['name'], requestData['price'], requestData['isbn'])
-# 		response = Response("Book sucessfully added", 201, mimetype='application/json')
-# 		response.headers['Location'] = "/addbooks/" + str(requestData['isbn'])
-# 		return response
-# 	else:
-# 		invalidBookObject = {
-# 			"error": "Invalid book object passed"
-# 		}
-# 		response = Response(json.dumps(invalidBookObject), status=400,mimetype='application/json')
-# 		return response
 
 app.run(port=9000)
 

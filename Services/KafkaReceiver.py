@@ -3,9 +3,9 @@ import csv
 from datetime import datetime
 import os
 
-consumer = KafkaConsumer('test')
-# for message in consumer:
-#     msg = str(message.value.decode())
+# consumer = KafkaConsumer('newOrderCreation')
+consumer = KafkaConsumer('test', bootstrap_servers=['localhost:9092'])
+# for msg in consumer:
 #     print(msg)
 
 if os.path.isfile('messages.csv'):
