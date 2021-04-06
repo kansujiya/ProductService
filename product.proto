@@ -1,0 +1,19 @@
+// Syntax version
+syntax = "proto3";
+
+// Service definition
+service PlaceOrderService {
+    rpc PlaceOrder (PlaceOrderRequest) returns (Order);
+}
+
+// Message types
+message Order {
+    int32 order_id = 1;
+    string order_date = 2;
+    int32 product_id = 3;
+    string msg = 4;        
+}
+
+message PlaceOrderRequest {
+    int32 product_id = 1;
+}
